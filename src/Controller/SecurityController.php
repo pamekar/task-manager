@@ -2,29 +2,34 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Form\UserType;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\Annotations as FOSRest;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\OAuthServerBundle\Model\ClientManagerInterface;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
 class SecurityController extends FOSRestController
 {
     private $client_manager;
+    private $encoderFactory;
 
-    public function __construct(ClientManagerInterface $client_manager)
+    public function __construct(ClientManagerInterface $client_manager, EncoderFactoryInterface $encoderFactory)
     {
+        $this->encoderFactory = $encoderFactory;
         $this->client_manager = $client_manager;
     }
 
     /**
      * Create Client.
-     * @FOSRest\Post("/createClient")
+     * @FOSRest\Post("/auth/createClient")
      *
      * @return Response
      */
-    public function AuthenticationAction(Request $request)
+    public function createClient(Request $request)
     {
         $data = json_decode($request->getContent(), true);
         if (empty($data['redirect-uri']) || empty($data['grant-type'])) {
@@ -38,6 +43,32 @@ class SecurityController extends FOSRestController
         $rows = [
             'client_id' => $client->getPublicId(), 'client_secret' => $client->getSecret()
         ];
-            return $this->handleView($this->view($rows));
+        return $this->handleView($this->view($rows));
+    }
+
+    /**
+     * Create Client.
+     * @FOSRest\Post("/auth/register")
+     *
+     * @return Response
+     */
+    public function createUser(Request $request)
+    {
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
+        $data = json_decode($request->getContent(), true);
+
+        $encoder = $this->encoderFactory->getEncoder($user);
+        $data['password'] = $encoder->encodePassword($data['password'], $user->getSalt());
+
+        $form->submit($data);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setPassword($data['password']);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($user);
+            $em->flush();
+            return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
+        }
+        return $this->handleView($this->view($form->getErrors()));
     }
 }
