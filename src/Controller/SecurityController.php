@@ -63,11 +63,12 @@ class SecurityController extends FOSRestController
 
         $form->submit($data);
         if ($form->isSubmitted() && $form->isValid()) {
-            $user->setPassword($data['password']);
             $em = $this->getDoctrine()->getManager();
+            $user->setEnabled(false);
             $em->persist($user);
             $em->flush();
-            return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
+
+            return $this->handleView($this->view(['status' => 'ok', 'data' => $user], Response::HTTP_CREATED));
         }
         return $this->handleView($this->view($form->getErrors()));
     }
