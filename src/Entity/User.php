@@ -19,6 +19,22 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity
  * @ORM\Table(name="users")
+ * @ORM\AttributeOverrides({
+ *      @ORM\AttributeOverride(name="usernameCanonical",
+ *          column=@ORM\Column(
+ *              name     = "username_canonical",
+ *              length   = 191,
+ *              unique   = true
+ *          )
+ *      ),
+ *      @ORM\AttributeOverride(name="emailCanonical",
+ *          column=@ORM\Column(
+ *              name     = "email_canonical",
+ *              length   = 191,
+ *              unique   = true
+ *          )
+ *      )
+ * })
  */
 class User extends BaseUser implements UserInterface, \Serializable
 {
