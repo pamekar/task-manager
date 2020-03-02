@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\Entity
  * @ORM\Table(name="users")
  */
 class User extends BaseUser implements UserInterface, \Serializable
@@ -53,6 +53,15 @@ class User extends BaseUser implements UserInterface, \Serializable
      */
     private $updatedAt;
 
+    public function __construct()
+    {
+        parent:: __construct();
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = new \DateTime();
+
+
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -66,36 +75,6 @@ class User extends BaseUser implements UserInterface, \Serializable
     public function setFullName(string $fullName): void
     {
         $this->fullName = $fullName;
-    }
-
-    public function getUserName(): ?string
-    {
-        return $this->userName;
-    }
-
-    public function setUserName($userName): void
-    {
-        $this->userName = $userName;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail($email): void
-    {
-        $this->email = $email;
-    }
-
-    public function getPassword(): ?string
-    {
-        return $this->password;
-    }
-
-    public function setPassword($password): void
-    {
-        $this->password = $password;
     }
 
     /**
