@@ -67,7 +67,7 @@ class TaskController extends AbstractFOSRestController
         $task->setAuthor($this->getUser());
 
         $data = json_decode($request->getContent(), true);
-        $validate = $this->validate($validator, $data);
+        $validate = $this->validate($validator, $data ?? []);
         if (!$validate['success']) {
             return $this->handleView($this->view(['status' => 'failed validation',
                 'data' => $validate], Response::HTTP_CREATED));
