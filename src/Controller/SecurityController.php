@@ -61,11 +61,11 @@ class SecurityController extends AbstractFOSRestController
         $data = json_decode($request->getContent(), true);
 
         $encoder = $this->encoderFactory->getEncoder($user);
-        $data['password'] = isset($data['password']) ? $encoder->encodePassword($data['password'], $user->getSalt()) : "";
 
         $form->submit($data);
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
+            $user->setPassword($encoder->encodePassword($data['password'], $user->getSalt()));
             $user->setEnabled(true);
             $em->persist($user);
             $em->flush();
