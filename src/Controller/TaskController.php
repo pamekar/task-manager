@@ -87,7 +87,7 @@ class TaskController extends AbstractFOSRestController
 
     /**
      * Update Task.
-     * @Rest\Patch("/{id}")
+     * @Rest\Put("/{id}")
      *
      * @param Request $request
      * @param $id
