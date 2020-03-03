@@ -151,8 +151,8 @@ class TaskController extends AbstractFOSRestController
         $constraints = new Assert\Collection([
             'title' => [new Assert\Length(['min' => 2])],
             'description' => [new Assert\Length(['min' => 2])],
-            'start_at' => [new Assert\DateTime()],
-            'end_at' => [new Assert\DateTime()]
+            'start_at' => [],
+            'end_at' => []
         ]);
 
         $fields = ['title' => null, 'description' => null, 'start_at' => null, 'end_at' => null];
