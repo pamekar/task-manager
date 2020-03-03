@@ -28,7 +28,8 @@ class TaskControllerTest extends TestCase
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
             'start_at' => $this->faker->dateTimeBetween('-2 weeks', 'now')->format('Y-m-d H:i:s'),
-            'end_at' => $this->faker->dateTimeBetween('now', '+2 weeks')->format('Y-m-d H:i:s')
+            'end_at' => $this->faker->dateTimeBetween('now', '+2 weeks')->format('Y-m-d H:i:s'),
+            'status' => 'pending'
         ];
 
         $response = $this->requestCreateTask($data);
@@ -39,27 +40,6 @@ class TaskControllerTest extends TestCase
 
         $this->assertEquals(201, $response->getStatusCode());
         $this->assertArraySubset($data, $result);
-    }
-
-    public function requestCreateTask(array $data = null, array $token = null)
-    {
-        $data = $data ?? [
-                'title' => $this->faker->sentence,
-                'description' => $this->faker->paragraph,
-                'start_at' => $this->faker->dateTimeBetween('-2 weeks', 'now')->format('Y-m-d H:i:s'),
-                'end_at' => $this->faker->dateTimeBetween('now', '+2 weeks')->format('Y-m-d H:i:s')
-            ];
-
-        $tokenResponse = $this->requestCreateToken();
-        $token = $token ?? json_decode($tokenResponse->getBody()->getContents(), true);
-
-        $client = new Client();
-
-        $response = $client->request('POST', 'http://localhost:8000/api/tasks/', [
-            'headers' => [
-                'Authorization' => "Bearer " . $token['access_token'],
-            ], 'json' => $data]);
-        return $response;
     }
 
     public function testCanShowTask()
@@ -116,7 +96,8 @@ class TaskControllerTest extends TestCase
         $client = new Client();
         $data = [
             'title' => $this->faker->sentence,
-            'description' => $this->faker->paragraph
+            'description' => $this->faker->paragraph,
+            'status' => $this->faker->randomElement(['active', 'completed'])
         ];
         $response = $client->request('PUT', 'http://localhost:8000/api/tasks/' . $task['data']['id'], [
             'headers' => [
@@ -200,6 +181,33 @@ class TaskControllerTest extends TestCase
             ]]);
 
         $this->assertEquals(204, $response->getStatusCode());
+    }
+
+    /**
+     * @param array|null $data
+     * @param array|null $token
+     * @return ResponseInterface
+     */
+    public function requestCreateTask(array $data = null, array $token = null)
+    {
+        $data = $data ?? [
+                'title' => $this->faker->sentence,
+                'description' => $this->faker->paragraph,
+                'start_at' => $this->faker->dateTimeBetween('-2 weeks', 'now')->format('Y-m-d H:i:s'),
+                'end_at' => $this->faker->dateTimeBetween('now', '+2 weeks')->format('Y-m-d H:i:s'),
+                'status' => 'pending'
+            ];
+
+        $tokenResponse = $this->requestCreateToken();
+        $token = $token ?? json_decode($tokenResponse->getBody()->getContents(), true);
+
+        $client = new Client();
+
+        $response = $client->request('POST', 'http://localhost:8000/api/tasks/', [
+            'headers' => [
+                'Authorization' => "Bearer " . $token['access_token'],
+            ], 'json' => $data]);
+        return $response;
     }
 
 }

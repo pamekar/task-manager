@@ -21,12 +21,14 @@ class Task
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
     /**
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank()
      *
      */
     private $title;
+
     /**
      * @ORM\Column(type="text")
      * @Assert\NotBlank()
@@ -48,6 +50,12 @@ class Task
     private $endAt;
 
     /**
+     * @ORM\Column(type="text")
+     * @Assert\NotBlank()
+     */
+    private $status;
+    
+    /**
      * @var \DateTime
      *
      * @ORM\Column(type="datetime")
@@ -60,7 +68,6 @@ class Task
      * @ORM\Column(type="datetime")
      */
     private $updatedAt;
-
 
     /**
      * @var User
@@ -156,6 +163,22 @@ class Task
         $this->endAt = $endAt;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param mixed $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+    
     public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;

@@ -120,6 +120,9 @@ class TaskController extends AbstractFOSRestController
             if ($end_at = $data['end_at'] ?? null) {
                 $task->setEndAt($end_at);
             }
+            if ($status = $data['status'] ?? null) {
+                $task->setStatus($status);
+            }
             $em = $this->getDoctrine()->getManager();
             $em->persist($task);
             $em->flush();
@@ -155,10 +158,11 @@ class TaskController extends AbstractFOSRestController
             'title' => [new Assert\Length(['min' => 2])],
             'description' => [new Assert\Length(['min' => 2])],
             'start_at' => [],
-            'end_at' => []
+            'end_at' => [],
+            'status' => [new Assert\Choice(['pending', 'active', 'approved'])]
         ]);
 
-        $fields = ['title' => null, 'description' => null, 'start_at' => null, 'end_at' => null];
+        $fields = ['title' => null, 'description' => null, 'start_at' => null, 'end_at' => null, 'status' => null];
         $input = array_merge($fields, $data); // Add absent fields to validator
 
         $violations = $validator->validate($input, $constraints);

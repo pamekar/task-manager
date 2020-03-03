@@ -17,6 +17,7 @@ class TaskType extends AbstractType
             ->add('description')
             ->add('start_at')
             ->add('end_at')
+            ->add('status')
             ->add('save', SubmitType::class);
     }
 
