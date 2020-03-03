@@ -4,15 +4,15 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpFoundation\Request;
-use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\Annotations as FOSRest;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\OAuthServerBundle\Model\ClientManagerInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
-class SecurityController extends FOSRestController
+class SecurityController extends AbstractFOSRestController
 {
     private $client_manager;
     private $encoderFactory;
@@ -27,6 +27,7 @@ class SecurityController extends FOSRestController
      * Create Client.
      * @FOSRest\Post("/auth/createClient")
      *
+     * @param Request $request
      * @return Response
      */
     public function createClient(Request $request)
@@ -50,6 +51,7 @@ class SecurityController extends FOSRestController
      * Create Client.
      * @FOSRest\Post("/auth/register")
      *
+     * @param Request $request
      * @return Response
      */
     public function createUser(Request $request)
@@ -71,5 +73,21 @@ class SecurityController extends FOSRestController
             return $this->handleView($this->view(['status' => 'ok', 'data' => $user], Response::HTTP_CREATED));
         }
         return $this->handleView($this->view($form->getErrors()));
+    }
+
+    /**
+     * Get logged in user
+     * @FOSRest\Get("/api/user")
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function getLoggedUser(Request $request)
+    {
+        $user = $this->getUser();
+        if ($user) {
+            return $this->handleView($this->view($user));
+        }
+        return $this->handleView($this->view(['status' => "User not found."], Response::HTTP_NOT_FOUND));
     }
 }
