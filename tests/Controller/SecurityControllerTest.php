@@ -1,15 +1,15 @@
 <?php
 
-namespace Tests\Controller;
+namespace App\Tests\Controller;
 
 use App\Entity\Task;
 
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use App\Tests\TestCase;
 
-class SecurityControllerTest extends WebTestCase
+class SecurityControllerTest extends TestCase
 {
     private $faker;
 
@@ -35,24 +35,6 @@ class SecurityControllerTest extends WebTestCase
         $this->assertArraySubset($data, $result['data']);
     }
 
-    /**
-     * @param null $data
-     * @return ResponseInterface
-     */
-    public function requestCreateUser($data = null)
-    {
-        $data = $data ?? [
-                'username' => $this->faker->userName,
-                'password' => 'password',
-                'email' => $this->faker->email,
-                'full_name' => $this->faker->name()
-            ];
-        $client = new Client();
-        $response = $client->request('POST', 'http://localhost:8000/auth/register',
-            ['json' => $data]);
-
-        return $response;
-    }
 
     public function testCanCreateClient()
     {
@@ -64,28 +46,9 @@ class SecurityControllerTest extends WebTestCase
         $this->assertArrayHasKey('client_secret', $result);
     }
 
-    /**
-     * @return ResponseInterface
-     */
-    public function requestCreateClient()
-    {
-        $data = ['redirect-uri' => $this->faker->url, 'grant-type' => 'password'];
-        $client = new Client();
-        $response = $client->request('POST', 'http://localhost:8000/auth/createClient',
-            ['json' => $data]);
-
-        return $response;
-    }
-
     public function testCanCreateToken()
     {
-        $userResponse = $this->requestCreateUser();
-        $user = json_decode($userResponse->getBody()->getContents(), true);
-
-        $clientResponse = $this->requestCreateClient();
-        $client = json_decode($clientResponse->getBody()->getContents(), true);
-
-        $response = $this->requestCreateToken($client, $user['data']);
+        $response = $this->requestCreateToken();
         $result = json_decode($response->getBody()->getContents(), true);
 
         $this->assertEquals(200, $response->getStatusCode());
@@ -95,27 +58,6 @@ class SecurityControllerTest extends WebTestCase
         $this->assertArrayHasKey('scope', $result);
         $this->assertArrayHasKey('refresh_token', $result);
 
-    }
-
-    /**
-     * @param array $client
-     * @param array $user
-     * @return ResponseInterface
-     */
-    public function requestCreateToken(array $client, array $user)
-    {
-        $data = [
-            'client_id' => $client['client_id'],
-            'client_secret' => $client['client_secret'],
-            'grant_type' => 'password',
-            'username' => $user['username'],
-            'password' => 'password'
-        ];
-
-        $client = new Client();
-        $response = $client->request('POST', 'http://localhost:8000/oauth/v2/token',
-            ['form_params' => $data]);
-        return $response;
     }
 
     public function testCanViewUser()
@@ -129,10 +71,7 @@ class SecurityControllerTest extends WebTestCase
         $userResponse = $this->requestCreateUser($data);
         $user = json_decode($userResponse->getBody()->getContents(), true);
 
-        $clientResponse = $this->requestCreateClient();
-        $client = json_decode($clientResponse->getBody()->getContents(), true);
-
-        $tokenResponse = $this->requestCreateToken($client, $user['data']);
+        $tokenResponse = $this->requestCreateToken(null, $user);
         $token = json_decode($tokenResponse->getBody()->getContents(), true);
 
         $client = new Client();
@@ -146,6 +85,5 @@ class SecurityControllerTest extends WebTestCase
         $this->assertEquals(200, $response->getStatusCode());
         unset($data['password']);
         $this->assertArraySubset($data, $result);
-
     }
 }
