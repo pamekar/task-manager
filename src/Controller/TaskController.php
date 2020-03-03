@@ -16,13 +16,13 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Task controller.
- * @Route("/api", name="api_")
+ * @Route("/api/tasks", name="api_")
  */
 class TaskController extends AbstractFOSRestController
 {
     /**
      * Lists all Tasks.
-     * @Rest\Get("/tasks")
+     * @Rest\Get("/")
      *
      * @return Response
      */
@@ -36,7 +36,7 @@ class TaskController extends AbstractFOSRestController
 
     /**
      * Show a Task.
-     * @Rest\Get("/tasks/{id}")
+     * @Rest\Get("/{id}")
      *
      * @param $id
      * @return Response
@@ -55,7 +55,7 @@ class TaskController extends AbstractFOSRestController
 
     /**
      * Create Task.
-     * @Rest\Post("/tasks")
+     * @Rest\Post("/")
      *
      * @param Request $request
      * @param ValidatorInterface $validator
@@ -87,7 +87,7 @@ class TaskController extends AbstractFOSRestController
 
     /**
      * Update Task.
-     * @Rest\Patch("/tasks/{id}")
+     * @Rest\Patch("/{id}")
      *
      * @param Request $request
      * @param $id
@@ -127,7 +127,7 @@ class TaskController extends AbstractFOSRestController
 
     /**
      * Delete Task.
-     * @Rest\Delete("/tasks/{id}")
+     * @Rest\Delete("/{id}")
      *
      * @param $id
      * @return Response
