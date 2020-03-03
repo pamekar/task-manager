@@ -44,7 +44,7 @@ class SecurityController extends AbstractFOSRestController
         $rows = [
             'client_id' => $client->getPublicId(), 'client_secret' => $client->getSecret()
         ];
-        return $this->handleView($this->view($rows));
+        return $this->handleView($this->view($rows, Response::HTTP_CREATED));
     }
 
     /**
