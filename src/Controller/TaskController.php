@@ -112,13 +112,13 @@ class TaskController extends AbstractFOSRestController
                 $task->setTitle($title);
             }
             if ($description = $data['description'] ?? null) {
-                $task->setTitle($description);
+                $task->setDescription($description);
             }
-            if ($start_date = $data['start_date'] ?? null) {
-                $task->setStartDdate($start_date);
+            if ($start_at = $data['start_at'] ?? null) {
+                $task->setStartAt($start_at);
             }
-            if ($end_date = $data['end_date'] ?? null) {
-                $task->setEndDate($end_date);
+            if ($end_at = $data['end_at'] ?? null) {
+                $task->setEndAt($end_at);
             }
             return $this->handleView($this->view(['status' => 'ok', 'data' => $task], Response::HTTP_NOT_FOUND));
         }
@@ -140,7 +140,7 @@ class TaskController extends AbstractFOSRestController
         if ($task && $task->getAuthor() === $this->getUser()) {
             $entityManager->remove($task);
             $entityManager->flush();
-            return $this->handleView($this->view(['status' => 'deleted']));
+            return $this->handleView($this->view(['status' => 'deleted'], 204));
         }
 
         return $this->handleView($this->view(['status' => "Task not found."], Response::HTTP_NOT_FOUND));
