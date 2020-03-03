@@ -4,7 +4,7 @@ use FOS\OAuthServerBundle\Entity\AccessToken as BaseAccessToken;
 use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity
- * * @ORM\AttributeOverrides({
+ * @ORM\AttributeOverrides({
  *      @ORM\AttributeOverride(name="token",
  *          column=@ORM\Column(
  *              name     = "token",

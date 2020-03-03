@@ -4,6 +4,15 @@ use FOS\OAuthServerBundle\Entity\AuthCode as BaseAuthCode;
 use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity
+ * @ORM\AttributeOverrides({
+ *      @ORM\AttributeOverride(name="token",
+ *          column=@ORM\Column(
+ *              name     = "token",
+ *              length   = 191,
+ *              unique   = true
+ *          )
+ *      )
+ * })
  */
 class AuthCode extends BaseAuthCode
 {
