@@ -30,7 +30,7 @@ class TaskController extends AbstractFOSRestController
     {
         $entityManager = $this->getDoctrine()->getManager();
         $repository = $entityManager->getRepository(Task::class);
-        $tasks = $repository->findall();
+        $tasks = $repository->findBy(['author' => $this->getUser()]);
         return $this->handleView($this->view($tasks));
     }
 
