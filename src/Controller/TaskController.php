@@ -120,7 +120,10 @@ class TaskController extends AbstractFOSRestController
             if ($end_at = $data['end_at'] ?? null) {
                 $task->setEndAt($end_at);
             }
-            return $this->handleView($this->view(['status' => 'ok', 'data' => $task], Response::HTTP_NOT_FOUND));
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($task);
+            $em->flush();
+            return $this->handleView($this->view(['status' => 'ok', 'data' => $task], Response::HTTP_OK));
         }
         return $this->handleView($this->view(['status' => "Task not found."], Response::HTTP_NOT_FOUND));
     }
