@@ -64,7 +64,7 @@ class SecurityController extends FOSRestController
         $form->submit($data);
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $user->setEnabled(false);
+            $user->setEnabled(true);
             $em->persist($user);
             $em->flush();
 
