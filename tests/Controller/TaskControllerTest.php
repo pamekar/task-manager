@@ -119,26 +119,33 @@ class TaskControllerTest extends TestCase
         $this->assertArraySubset($data, $result);
     }
 
-    public function testCanListTasks()
+    public function testCanListDailyTasks()
     {
-        $data = [
+        $userData = [
             'username' => $this->faker->userName,
             'password' => 'password',
             'email' => $this->faker->email,
             'full_name' => $this->faker->name()
         ];
-        $userResponse = $this->requestCreateUser($data);
+        $taskData = [
+            'title' => $this->faker->sentence,
+            'description' => $this->faker->paragraph,
+            'start_at' => $this->faker->dateTimeBetween('-2 weeks', 'now')->format('Y-m-d H:i:s'),
+            'end_at' => $this->faker->dateTimeBetween('now', '+2 weeks')->format('Y-m-d H:i:s'),
+            'status' => 'pending'
+        ];
+        $userResponse = $this->requestCreateUser($userData);
         $user = json_decode($userResponse->getBody()->getContents(), true);
 
         $tokenResponse = $this->requestCreateToken(null, $user);
         $token = json_decode($tokenResponse->getBody()->getContents(), true);
         $tasks = [];
         foreach (range(0, 4) as $index) {
-            $tasks[] = $this->requestCreateTask(null, $token);
+            $tasks[] = $this->requestCreateTask($taskData, $token);
         }
 
         $client = new Client();
-        $response = $client->request('GET', 'http://localhost:8000/api/tasks/', [
+        $response = $client->request('GET', 'http://localhost:8000/api/tasks/show/day/' . time(), [
             'headers' => [
                 'Authorization' => "Bearer " . $token['access_token']
             ]]);
@@ -152,8 +159,12 @@ class TaskControllerTest extends TestCase
             $this->assertArrayHasKey('start_at', $result);
             $this->assertArrayHasKey('end_at', $result);
 
+            // Check if task can be listed
+            $this->assertGreaterThan(time(), strtotime($result['end_at']));
+            $this->assertLessThan(time(), strtotime($result['start_at']));
+
             // Confirm that this is user's task
-            $this->assertArraySubset($user['data'], $result['author']);
+            $this->assertEquals($user['data']['id'], $result['author_id']);
         }
     }
 
