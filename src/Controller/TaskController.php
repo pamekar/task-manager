@@ -52,16 +52,15 @@ class TaskController extends AbstractFOSRestController
 
     /**
      * Show a Task.
-     * @Rest\Get("/show/day")
+     * @Rest\Get("/show/current")
      *
      * @param $id
      * @return Response
      */
     public function showDailyTasksAction()
     {
-        $entityManager = $this->getDoctrine()->getManager();
-        $repository = $entityManager->getRepository(Task::class);
-        $tasks = $repository->findBy(['author' => $this->getUser()]);
+        $repository = $this->getDoctrine()->getRepository(Task::class);
+        $tasks = $repository->findCurrentTasks($this->getUser());
         return $this->handleView($this->view($tasks));
     }
 
