@@ -4,7 +4,7 @@ This is a REST application grants a user the ability to see a list of tasks for 
 
 Symfony/Skeleton framework was used in developing this. It is currently hosted on Heroku @ https://basic-taskmanager.herokuapp.com/.
 
-The API endpoints can be imported into postman for testing using this Postman collection url: https://www.getpostman.com/collections/5955d8c13c59083387b9.
+The API endpoints can be imported into postman for testing using this Postman collection url: https://www.getpostman.com/collections/991721ed8d19cbf39c18.
 
 Tests were made for this application, and can be found in the **tests** folder. Below are the list of endpoints accessible on this app.
 
