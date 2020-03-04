@@ -38,19 +38,31 @@ class TaskController extends AbstractFOSRestController
      * Show a Task.
      * @Rest\Get("/{id}")
      *
-     * @param $id
+     * @param Task $task
      * @return Response
      */
-    public function showTasksAction($id)
+    public function showTasksAction(Task $task)
     {
-        $entityManager = $this->getDoctrine()->getManager();
-        $repository = $entityManager->getRepository(Task::class);
-        $task = $repository->find($id);
-        if ($task && $task->getAuthor() === $this->getUser()) {
+        if ($task->getAuthor() === $this->getUser()) {
             return $this->handleView($this->view($task));
         }
 
         return $this->handleView($this->view(['status' => "Task not found."], Response::HTTP_NOT_FOUND));
+    }
+
+    /**
+     * Show a Task.
+     * @Rest\Get("/show/day")
+     *
+     * @param $id
+     * @return Response
+     */
+    public function showDailyTasksAction()
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $repository = $entityManager->getRepository(Task::class);
+        $tasks = $repository->findBy(['author' => $this->getUser()]);
+        return $this->handleView($this->view($tasks));
     }
 
     /**
@@ -70,7 +82,7 @@ class TaskController extends AbstractFOSRestController
         $validate = $this->validate($validator, $data ?? []);
         if (!$validate['success']) {
             return $this->handleView($this->view(['status' => 'failed validation',
-                'data' => $validate], Response::HTTP_CREATED));
+                'data' => $validate], 422));
         }
 
         $form = $this->createForm(TaskType::class, $task);
@@ -80,7 +92,7 @@ class TaskController extends AbstractFOSRestController
             $em = $this->getDoctrine()->getManager();
             $em->persist($task);
             $em->flush();
-            return $this->handleView($this->view(['status' => 'ok', 'data' => $task], Response::HTTP_CREATED));
+            return $this->handleView($this->view(['status' => 'ok', 'data' => $task], 201));
         }
         return $this->handleView($this->view($form->getErrors()));
     }
@@ -90,24 +102,21 @@ class TaskController extends AbstractFOSRestController
      * @Rest\Put("/{id}")
      *
      * @param Request $request
-     * @param $id
+     * @param Task $task
      * @param ValidatorInterface $validator
      * @return Response
      */
-    public function updateTasksAction(Request $request, $id, ValidatorInterface $validator)
+    public function updateTasksAction(Request $request, Task $task, ValidatorInterface $validator)
     {
-        $entityManager = $this->getDoctrine()->getManager();
-        $repository = $entityManager->getRepository(Task::class);
-        $task = $repository->find($id);
         $data = json_decode($request->getContent(), true);
         $validate = $this->validate($validator, $data);
         if (!$validate['success']) {
             return $this->handleView($this->view(['status' => 'failed validation',
-                'data' => $validate], Response::HTTP_CREATED));
+                'data' => $validate], 422));
         }
 
         $data = $validate['data'];
-        if ($task && $task->getAuthor() === $this->getUser()) {
+        if ($task->getAuthor() === $this->getUser()) {
             if ($title = $data['title'] ?? null) {
                 $task->setTitle($title);
             }
@@ -126,7 +135,7 @@ class TaskController extends AbstractFOSRestController
             $em = $this->getDoctrine()->getManager();
             $em->persist($task);
             $em->flush();
-            return $this->handleView($this->view(['status' => 'ok', 'data' => $task], Response::HTTP_OK));
+            return $this->handleView($this->view(['status' => 'ok', 'data' => $task], 200));
         }
         return $this->handleView($this->view(['status' => "Task not found."], Response::HTTP_NOT_FOUND));
     }
@@ -159,7 +168,7 @@ class TaskController extends AbstractFOSRestController
             'description' => [new Assert\Length(['min' => 2])],
             'start_at' => [],
             'end_at' => [],
-            'status' => [new Assert\Choice(['pending', 'active', 'approved'])]
+            'status' => [new Assert\Choice(['pending', 'active', 'completed'])]
         ]);
 
         $fields = ['title' => null, 'description' => null, 'start_at' => null, 'end_at' => null, 'status' => null];
